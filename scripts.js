@@ -1,33 +1,57 @@
-// 1. On crée l'application PixiJS
 const app = new PIXI.Application();
+let zombies = [];
+let textureZombie; // On déclare la variable ici pour qu'elle soit vide au départ
 
 async function setup() {
-  // On attend que l'application soit prête
   await app.init({
     width: window.innerWidth,
     height: window.innerHeight,
     backgroundColor: 0x1099bb,
   });
-
-  // On ajoute le canvas généré par Pixi dans le HTML
   document.body.appendChild(app.canvas);
 
-  // 2. On charge l'image de la map
-  // REMPLACEZ LE CHEMIN CI-DESSOUS
-  const texture = await PIXI.Assets.load("./assets/jeux-map.jpg");
+  // --- CHARGEMENT DES ASSETS ---
+  // On charge la map ET le zombie ici
+  const textureMap = await PIXI.Assets.load("./assets/jeux-map.jpg");
+  textureZombie = await PIXI.Assets.load("./assets/zombie-walk.png");
 
-  // 3. On crée le Sprite (l'objet visuel)
-  const background = new PIXI.Sprite(texture);
-
-  // On force la map à prendre toute la taille de l'écran
+  // --- CRÉATION DU BACKGROUND ---
+  const background = new PIXI.Sprite(textureMap);
   background.width = app.screen.width;
   background.height = app.screen.height;
-
-  // 4. On l'ajoute à la scène (le Stage)
   app.stage.addChild(background);
 
-  console.log("Map chargée avec succès !");
+  // --- LA BOUCLE DE MOUVEMENT (Ticker) ---
+  app.ticker.add((delta) => {
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      const zombie = zombies[i];
+      zombie.x -= 2 * delta.deltaTime;
+
+      if (zombie.x < -100) {
+        app.stage.removeChild(zombie);
+        zombies.splice(i, 1);
+      }
+    }
+  });
+
+  // --- LANCEMENT DE L'INVASION ---
+  // On ne commence à créer des zombies que quand tout est prêt
+  setInterval(() => {
+    createOneZombie(); // On appelle la fonction de création
+  }, 5000);
+
+  console.log("Jeu prêt et invasion commencée !");
 }
 
-// On lance la fonction setup
+// Ta fonction de création (plus besoin d'async ici car l'image est déjà chargée)
+function createOneZombie() {
+  const zombie = new PIXI.Sprite(textureZombie);
+  zombie.anchor.set(0.5);
+  zombie.x = app.screen.width + 50;
+  zombie.y = Math.random() * app.screen.height;
+
+  app.stage.addChild(zombie);
+  zombies.push(zombie);
+}
+
 setup();
