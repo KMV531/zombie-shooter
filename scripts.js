@@ -5,7 +5,7 @@ const ctx = canvas.getContext("2d");
 
 // Image de fond
 const imgFond = new Image();
-imgFond.src = "./assets/fond.webp";
+imgFond.src = "./assets/FOND.jpg";
 
 // Image du Joueur
 const imgJoueur = new Image();
